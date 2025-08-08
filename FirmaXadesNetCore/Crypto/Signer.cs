@@ -66,7 +66,7 @@ namespace FirmaXadesNetCore.Crypto
             {
                 throw new ArgumentNullException("certificate");
             }
-            
+
             if (!certificate.HasPrivateKey)
             {
                 throw new Exception("El certificado no contiene ninguna clave privada");
@@ -75,6 +75,28 @@ namespace FirmaXadesNetCore.Crypto
             _signingCertificate = certificate;
 
             SetSigningKey(_signingCertificate);
+        }
+
+        //  Added for HSM Support
+        /// <summary>
+        /// Constructor for scenarios where the private key is handled externally (e.g., HSM).
+        /// </summary>
+        /// <param name="certificate">The public certificate.</param>
+        /// <param name="signingKey">The asymmetric algorithm representing the private key (e.g., RsaHsm).</param>
+        public Signer(X509Certificate2 certificate, AsymmetricAlgorithm signingKey)
+        {
+            if (certificate == null)
+            {
+                throw new ArgumentNullException(nameof(certificate));
+            }
+            if (signingKey == null)
+            {
+                throw new ArgumentNullException(nameof(signingKey));
+            }
+
+            _signingCertificate = certificate;
+            _signingKey = signingKey; // Directly assign the external signing key
+            _disposeCryptoProvider = false;
         }
 
         #endregion
